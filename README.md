@@ -27,7 +27,8 @@ http://support.sas.com/kb/33/092.html
     >>> r['p'] < 0.05 # not < 0.05 evidence to reject Ho of random sequence
     False
 
-# this should show significance for non-randomness
+this should show significance for non-randomness
+
     >>> li = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
     >>> wald_wolfowitz(li)['p'] < 0.05
     True
