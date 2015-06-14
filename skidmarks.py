@@ -92,7 +92,6 @@ def auto_correlation(sequence):
     >>> result = auto_correlation('00000001111111111100000000')
     >>> result['p'] < 0.05
     True
-
     >>> result['auto_correlation']
     0.83766233766233755
 
@@ -142,7 +141,7 @@ def serial_test(sequence):
     d = collections.defaultdict(int)
     for k in pairwise: d[k] += 1
     # order doesnt matter because the expected are all the same.
-    obs = np.array(d.values())
+    obs = np.array(list(d.values()))
     exp = np.ones_like(obs) * obs.mean()
 
     chi, pval =  chisquare(obs, exp)
