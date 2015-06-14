@@ -17,9 +17,31 @@ Any feedback or improvements are welcomed
 
 import math
 from scipy.stats import zprob, linregress, chisquare
-from itertools import groupby, izip
+from itertools import groupby
+# yoavram: Bug fix for Python 3 as suggested in https://github.com/nschloe/matplotlib2tikz/issues/20
+try:
+    from itertools import izip
+except ImportError:
+    izip = zip
 import numpy as np
 import collections
+
+# yoavram: fix string import stuff in python 3, see https://github.com/oxplot/fysom/issues/1
+try:
+    unicode = unicode
+except NameError:
+    # 'unicode' is undefined, must be Python 3
+    str = str
+    unicode = str
+    bytes = bytes
+    basestring = (str,bytes)
+else:
+    # 'unicode' exists, must be Python 2
+    str = str
+    unicode = unicode
+    bytes = str
+    basestring = basestring
+
 
 def wald_wolfowitz(sequence):
     """
@@ -87,14 +109,13 @@ def auto_correlation(sequence):
     >>> result = auto_correlation('00000001111111111100000000')
     >>> result['p'] < 0.05
     True
-
     >>> result['auto_correlation']
     0.83766233766233755
 
     """
     if isinstance(sequence, basestring):
         sequence = map(int, sequence)
-    seq = np.array(sequence, dtype=np.int)
+    seq = np.array(list(sequence), dtype=np.int)
     dseq = np.column_stack((seq[1:], seq[:-1]))
     slope, intercept, r, ttp, see = linregress(seq[1:], seq[:-1])
     cc = np.corrcoef(dseq, rowvar=0)[0][1]
@@ -125,19 +146,18 @@ def serial_test(sequence):
                      [1, 0, 1, 0, 1]
     :rtype: returns dict of {'chi': <chisquare value>, 'p': <p-value of said chisquare>}
 
-    >>> serial_test('101010101111000')
-    {'chi': 1.4285714285714286, 'p': 0.69885130769248427}
+    >>> sorted(serial_test('101010101111000').items())
+    [('chi', 1.4285714285714286), ('p', 0.69885130769248427)]
 
-    >>> serial_test('110000000000000111111111111')
-    {'chi': 18.615384615384617, 'p': 0.00032831021826061683}
-
+    >>> sorted(serial_test('110000000000000111111111111').items())
+    [('chi', 18.615384615384617), ('p', 0.00032831021826061683)]
     """
     #if isinstance(sequence, basestring): sequence = map(int, sequence)
     pairwise = izip(sequence[1:], sequence[:-1])
     d = collections.defaultdict(int)
     for k in pairwise: d[k] += 1
     # order doesnt matter because the expected are all the same.
-    obs = np.array(d.values())
+    obs = np.array(list(d.values()))
     exp = np.ones_like(obs) * obs.mean()
 
     chi, pval =  chisquare(obs, exp)
@@ -153,20 +173,24 @@ def gap_test(sequence, item=None):
     the gap test for runs. takes a sequence and option `item`
     :param item: is used to test for gaps.
     :rtype: dict of pvalue, chi-square and the `item`
-    >>> gap_test('100020001200000')
-    {'chi': 756406.99909855379, 'item': '1', 'p': 0.0}
 
-    >>> gap_test('101010111101000')
-    {'chi': 11.684911193438811, 'item': '1', 'p': 0.23166089118674466}
+    >>> result = gap_test('100020001200000')
+    >>> 756406 < result['chi'] < 756407
+    True
+    >>> result['item']
+    '1'
+    >>> np.allclose(result['p'], 0)
+    True
 
+    >>> sorted(gap_test('101010111101000').items())
+    [('chi', 11.684911193438811), ('item', '1'), ('p', 0.23166089118674466)]
 
     gap_test() will default to looking for gaps between the first value in
     the sequence (in this case '1') and each later occurrence. use the `item`
     kwarg to specify another value.
 
-        >>> gap_test('101010111101000', item='0')
-        {'chi': 11.028667632612191, 'item': '0', 'p': 0.27374903509732523}
-
+    >>> sorted(gap_test('101010111101000', item='0').items())
+    [('chi', 11.028667632612191), ('item', '0'), ('p', 0.27374903509732523)]
 
     """
 
