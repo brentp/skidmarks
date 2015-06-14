@@ -173,8 +173,14 @@ def gap_test(sequence, item=None):
     the gap test for runs. takes a sequence and option `item`
     :param item: is used to test for gaps.
     :rtype: dict of pvalue, chi-square and the `item`
-    >>> sorted(gap_test('100020001200000').items())
-    [('chi', 756406.99909855379), ('item', '1'), ('p', 0.0)]
+
+    >>> result = gap_test('100020001200000')
+    >>> 756406 < result['chi'] < 756407
+    True
+    >>> result['item']
+    '1'
+    >>> np.allclose(result['p'], 0)
+    True
 
     >>> sorted(gap_test('101010111101000').items())
     [('chi', 11.684911193438811), ('item', '1'), ('p', 0.23166089118674466)]
