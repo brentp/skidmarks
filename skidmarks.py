@@ -17,7 +17,12 @@ Any feedback or improvements are welcomed
 
 import math
 from scipy.stats import zprob, linregress, chisquare
-from itertools import groupby, izip
+from itertools import groupby
+# yoavram: Bug fix for Python 3 as suggested in https://github.com/nschloe/matplotlib2tikz/issues/20
+try:
+    from itertools import izip
+except ImportError:
+    izip = zip
 import numpy as np
 import collections
 
