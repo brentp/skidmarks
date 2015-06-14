@@ -146,12 +146,11 @@ def serial_test(sequence):
                      [1, 0, 1, 0, 1]
     :rtype: returns dict of {'chi': <chisquare value>, 'p': <p-value of said chisquare>}
 
-    >>> serial_test('101010101111000')
-    {'chi': 1.4285714285714286, 'p': 0.69885130769248427}
+    >>> sorted(serial_test('101010101111000').items())
+    [('chi', 1.4285714285714286), ('p', 0.69885130769248427)]
 
-    >>> serial_test('110000000000000111111111111')
-    {'chi': 18.615384615384617, 'p': 0.00032831021826061683}
-
+    >>> sorted(serial_test('110000000000000111111111111').items())
+    [('chi', 18.615384615384617), ('p', 0.00032831021826061683)]
     """
     #if isinstance(sequence, basestring): sequence = map(int, sequence)
     pairwise = izip(sequence[1:], sequence[:-1])
@@ -174,20 +173,18 @@ def gap_test(sequence, item=None):
     the gap test for runs. takes a sequence and option `item`
     :param item: is used to test for gaps.
     :rtype: dict of pvalue, chi-square and the `item`
-    >>> gap_test('100020001200000')
-    {'chi': 756406.99909855379, 'item': '1', 'p': 0.0}
+    >>> sorted(gap_test('100020001200000').items())
+    [('chi', 756406.99909855379), ('item', '1'), ('p', 0.0)]
 
-    >>> gap_test('101010111101000')
-    {'chi': 11.684911193438811, 'item': '1', 'p': 0.23166089118674466}
-
+    >>> sorted(gap_test('101010111101000').items())
+    [('chi', 11.684911193438811), ('item', '1'), ('p', 0.23166089118674466)]
 
     gap_test() will default to looking for gaps between the first value in
     the sequence (in this case '1') and each later occurrence. use the `item`
     kwarg to specify another value.
 
-        >>> gap_test('101010111101000', item='0')
-        {'chi': 11.028667632612191, 'item': '0', 'p': 0.27374903509732523}
-
+    >>> sorted(gap_test('101010111101000', item='0').items())
+    [('chi', 11.028667632612191), ('item', '0'), ('p', 0.27374903509732523)]
 
     """
 
