@@ -41,7 +41,7 @@ else:
     unicode = unicode
     bytes = str
     basestring = basestring
-    
+
 
 def wald_wolfowitz(sequence):
     """
@@ -115,7 +115,7 @@ def auto_correlation(sequence):
     """
     if isinstance(sequence, basestring):
         sequence = map(int, sequence)
-    seq = np.array(sequence, dtype=np.int)
+    seq = np.array(list(sequence), dtype=np.int)
     dseq = np.column_stack((seq[1:], seq[:-1]))
     slope, intercept, r, ttp, see = linregress(seq[1:], seq[:-1])
     cc = np.corrcoef(dseq, rowvar=0)[0][1]
