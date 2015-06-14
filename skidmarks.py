@@ -26,6 +26,23 @@ except ImportError:
 import numpy as np
 import collections
 
+# yoavram: fix string import stuff in python 3, see https://github.com/oxplot/fysom/issues/1
+try:
+    unicode = unicode
+except NameError:
+    # 'unicode' is undefined, must be Python 3
+    str = str
+    unicode = str
+    bytes = bytes
+    basestring = (str,bytes)
+else:
+    # 'unicode' exists, must be Python 2
+    str = str
+    unicode = unicode
+    bytes = str
+    basestring = basestring
+    
+
 def wald_wolfowitz(sequence):
     """
     implements the wald-wolfowitz runs test:
