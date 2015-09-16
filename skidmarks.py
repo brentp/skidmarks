@@ -16,7 +16,12 @@ Any feedback or improvements are welcomed
 """
 
 import math
-from scipy.stats import zprob, linregress, chisquare
+from scipy.stats import linregress, chisquare
+try:
+    from scipy.stats import zprob
+except ImportError:
+    from scipy.special import ndtr as zprob
+
 from itertools import groupby
 # yoavram: Bug fix for Python 3 as suggested in https://github.com/nschloe/matplotlib2tikz/issues/20
 try:
@@ -54,12 +59,12 @@ def wald_wolfowitz(sequence):
                      [1, 0, 1, 0, 1]
                      'abaaabbba'
 
-    :rtype: a dict with keys of 
-        `n_runs`: the number of runs in the sequence 
-        `p`: the support to reject the null-hypothesis that the number of runs 
+    :rtype: a dict with keys of
+        `n_runs`: the number of runs in the sequence
+        `p`: the support to reject the null-hypothesis that the number of runs
              supports a random sequence
-        `z`: the z-score, used to calculate the p-value 
-        `sd`, `mean`: the expected standard deviation, mean the number of runs, 
+        `z`: the z-score, used to calculate the p-value
+        `sd`, `mean`: the expected standard deviation, mean the number of runs,
                       given the ratio of numbers of 1's/0's in the sequence
 
     >>> r = wald_wolfowitz('1000001')
@@ -83,7 +88,7 @@ def wald_wolfowitz(sequence):
     # expected mean runs
     ER = ((2 * n * m ) / (n + m)) + 1
     # expected variance runs
-    VR = (2 * n * m * (2 * n * m - n - m )) / ((n + m)**2 * (n + m - 1)) 
+    VR = (2 * n * m * (2 * n * m - n - m )) / ((n + m)**2 * (n + m - 1))
     O = (ER - 1) * (ER - 2) / (n + m - 1.)
     assert VR - O < 0.001, (VR, O)
 
@@ -151,6 +156,7 @@ def serial_test(sequence):
 
     >>> sorted(serial_test('110000000000000111111111111').items())
     [('chi', 18.615384615384617), ('p', 0.00032831021826061683)]
+
     """
     #if isinstance(sequence, basestring): sequence = map(int, sequence)
     pairwise = izip(sequence[1:], sequence[:-1])
@@ -174,6 +180,7 @@ def gap_test(sequence, item=None):
     :param item: is used to test for gaps.
     :rtype: dict of pvalue, chi-square and the `item`
 
+    >>> import numpy as np
     >>> result = gap_test('100020001200000')
     >>> 756406 < result['chi'] < 756407
     True
@@ -185,6 +192,7 @@ def gap_test(sequence, item=None):
     >>> sorted(gap_test('101010111101000').items())
     [('chi', 11.684911193438811), ('item', '1'), ('p', 0.23166089118674466)]
 
+
     gap_test() will default to looking for gaps between the first value in
     the sequence (in this case '1') and each later occurrence. use the `item`
     kwarg to specify another value.
@@ -194,7 +202,7 @@ def gap_test(sequence, item=None):
 
     """
 
-    if item is None: item=sequence[0] 
+    if item is None: item=sequence[0]
 
     seq = [1 if s == item else 0 for s in sequence]
     assert 0 < sum(seq) < len(sequence), \
@@ -214,7 +222,7 @@ def test_suite():
     import doctest
     suite = doctest.DocFileSuite(__file__, module_relative=False)
     return suite
-    
+
 if __name__ == "__main__":
 
     import doctest
