@@ -105,9 +105,10 @@ def auto_correlation(sequence):
     as the 'auto_correlation' it is less likely that the sequence is
     generated randomly.
     :param sequence: any iterable with at most 2 values that can be turned
-                     into an integer via int() . e.g.
+                     into a float via np.float . e.g.
                      '1001001'
                      [1, 0, 1, 0, 1]
+                     [1.2,.1,.5,1]
     :rtype: returns a dict of the linear regression stats of sequence[1:] vs.
             sequence[:-1]
 
@@ -120,7 +121,7 @@ def auto_correlation(sequence):
     """
     if isinstance(sequence, basestring):
         sequence = map(int, sequence)
-    seq = np.array(list(sequence), dtype=np.int)
+    seq = np.array(list(sequence), dtype=np.float)
     dseq = np.column_stack((seq[1:], seq[:-1]))
     slope, intercept, r, ttp, see = linregress(seq[1:], seq[:-1])
     cc = np.corrcoef(dseq, rowvar=0)[0][1]
